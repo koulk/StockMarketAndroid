@@ -1,0 +1,170 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+    <!--Highcharts-->
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+
+
+    <!--<script src="moment.js"></script>
+    <script src="moment-timezone.js"></script>
+    <script src="moment-timezone-with-data-2012-2022.js"></script>-->
+</head>
+<style>
+.error{
+text-align: center;
+font-size:18px;
+margin-top: 30px;
+}
+.loader {
+  border: 3px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 3px solid #000000;
+  width: 40px;
+  height: 40px;
+  margin: auto;
+  margin-top:20px;
+  -webkit-animation: spin 1s linear infinite;
+  animation: spin 1s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+<body>
+<div class="loader"></div>
+<div class="error"><span>Failed to load data.</span></div>
+<div id="container"></div>
+</body>
+<script>
+var url = "http://alphavantageapi-env.us-east-2.elasticbeanstalk.com/api/dailydata?stockName=";
+$('.loader').show();
+$('.error').hide();
+var stockName= Android.getStockName();
+  $.ajax(url+stockName, {
+      success: function(data) {
+         $('.loader').hide();
+         buildHistoricalChart(JSON.parse(data), stockName);
+      },
+      error: function() {
+        $('.loader').hide();
+        $('.error').show();
+       }
+   });
+
+  function convertToUTC(date){
+       var dateArr = date.split("-");
+       return Date.UTC(dateArr[0], dateArr[1]-1, dateArr[2]);
+    }
+
+function buildHistoricalChart(stockdata, stockName){
+              // data array of array N*2 first UTC time, second value
+              var data = [];
+              for (date in stockdata["prices"]){
+                 var stockEntry = [];
+                 stockEntry.push(convertToUTC(date));
+                 stockEntry.push(stockdata["prices"][date]["close"])
+                 data.unshift(stockEntry);
+              }
+
+              Highcharts.stockChart('container', {
+                  chart: {
+                          zoomType: 'x',
+                          events:{
+                          load: function() {
+                              this.subtitle.element.onclick = function() {
+                                  window.open(
+                                  'https://www.alphavantage.co',
+                                  '_blank'
+                                  );
+                              }
+                            }
+                         }
+                  },
+                  tooltip: {
+                          formatter: function () {
+                              var s = Highcharts.dateFormat('%A, %b %e, %Y', this.x) ;
+
+                              $.each(this.points, function () {
+                                  s += '<br/>' +'<span style="color:' + this.series.color + '">\u25CF</span>' + ' '+this.series.name + ': '+'<b>' + (this.y).toFixed(2) + '</b>';
+                              });
+
+                              return s;
+                          }
+                   },
+                  rangeSelector: {
+                  allButtonsEnabled: true,
+                  buttons: [{
+                            type: 'week',
+                            count: 1,
+                            text: '1w'
+                        },{
+                            type: 'month',
+                            count: 1,
+                            text: '1m'
+                        }, {
+                            type: 'month',
+                            count: 3,
+                            text: '3m'
+                        }, {
+                            type: 'month',
+                            count: 6,
+                            text: '6m'
+                        }, {
+                            type: 'ytd',
+                            text: 'YTD'
+                        }, {
+                            type: 'year',
+                            count: 1,
+                            text: '1y'
+                        }, {
+                            type: 'all',
+                            text: 'All'
+                        }],
+
+                          selected: 0
+                      },
+
+                  title: {
+                      text: stockName + " Stock Value"
+                  },
+                  subtitle: {
+                    text: 'Source: Alpha Vantage',
+                    style: {
+                    color: '#0000ff'
+                    }
+                  },
+                  yAxis: {
+                      title: {
+                          text: 'Stock Value'
+                      }
+                  },
+                  legend: {
+                      enabled: false
+                  },
+
+                  series: [{
+                      type: 'area',
+                      name: stockName,
+                      data: data,
+                      tooltip: {
+                          valueDecimals: 2
+                      }
+                  }]
+              });
+    }
+</script>
+
+</html>

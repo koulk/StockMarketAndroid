@@ -1,0 +1,947 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+        .error{
+          text-align: center;
+          font-size:18px;
+          margin-top: 20px;
+        }
+
+        .loader {
+          border: 3px solid #4d4d4d;
+          border-radius: 50%;
+          border-top: 3px solid #FFCE38;
+          width: 40px;
+          height: 40px;
+          margin: auto;
+          margin-top:20px;
+          -webkit-animation: spin 1s linear infinite;
+          animation: spin 1s linear infinite;
+        }
+
+        @-webkit-keyframes spin {
+          0% { -webkit-transform: rotate(0deg); }
+          100% { -webkit-transform: rotate(360deg); }
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+</style>
+</head>
+
+<body style="margin: 0; padding: 0; backgroundColor : '#4d4d4d'">
+<div class="loader"></div>
+<div id="indicatorGraph"></div>
+<div class="error"><span>Failed to load data.</span></div>
+<div style="min-height:40px;"></div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+<script>
+$('.loader').show();
+$('.error').hide();
+var exportURL = "";
+var stockName= Android.getStockName();
+var category = Android.getIndicatorCategory().toUpperCase();
+
+
+var url = "http://alphavantageapi-env.us-east-2.elasticbeanstalk.com/api/";
+drawCharts(url, category, stockName);
+
+function buildShareableURL(){
+       var data = {
+       svg: $('#indicatorGraph').highcharts().getSVG(),
+       type: 'image/png',
+       async: true,
+       width:450
+       };
+       var baseURL = 'http://export.highcharts.com/';
+       $.post(baseURL, data, function(data1) {
+           exportURL = baseURL + data1;
+           Android.setExportURL(exportURL);
+       });
+  };
+
+function drawCharts(url, category, stockName){
+
+ switch (category) {
+  case 'PRICE':
+    url = url+"dailydata?stockName="+escape(stockName);
+    break;
+  case 'SMA':
+    url = url+"SMA?stockName="+escape(stockName);
+    break;
+  case 'EMA':
+    url = url+"EMA?stockName="+escape(stockName);
+    break;
+  case 'MACD':
+    url = url+"MACD?stockName="+escape(stockName);
+    break;
+  case 'RSI':
+    url = url+"RSI?stockName="+escape(stockName);
+    break;
+  case 'ADX':
+    url = url+"ADX?stockName="+escape(stockName);
+	break;
+  case 'CCI':
+    url = url+"CCI?stockName="+escape(stockName);
+    break;
+}
+
+  $.ajax(url, {
+      success: function(data) {
+      	 $('.loader').hide();
+      	 var response = JSON.parse(data);
+     switch (category) {
+		  case 'PRICE':
+		    priceGraph(stockName, response);
+		    break;
+		  case 'SMA':
+		    smaGraph(stockName, response);
+		    break;
+		  case 'EMA':
+		    emaGraph(stockName, response);
+		    break;
+		  case 'MACD':
+		    macdGraph(stockName, response);
+		    break;
+		  case 'RSI':
+		    rsiGraph(stockName, response);
+		    break;
+		  case 'ADX':
+		    adxGraph(stockName, response);
+			break;
+		  case 'CCI':
+		    cciGraph(stockName, response);
+		    break;
+		}
+		buildShareableURL();
+      },
+      error: function() {
+      	   $('.loader').hide();
+           $('.error').show();
+       }
+   });
+
+  }
+ Array.prototype.max = function() {
+      return Math.max.apply(null, this);
+    }
+
+  function convertToUTC(date){
+       var dateArr = date.split("-");
+       return Date.UTC(dateArr[0], dateArr[1]-1, dateArr[2]);
+    }
+
+   function macdGraph(stockName, macddata){
+
+                var macd = [];
+                var macdHist = [];
+                var macdSignal = [];
+                var timeValue = [];
+                var utcTime = [];
+                var currDate;
+
+
+                if(macddata == null || !("macdData" in macddata)){
+                  return;
+                }
+                var counter = 0;
+                for (date in macddata["macdData"]) {
+                   if(counter == 0) {
+                      currDate = new Date(date);
+                      counter++;
+                   }
+
+                   var timeDifference = currDate.getTime() - new Date(date).getTime();
+                   if (timeDifference <= 15780000000)
+                   {
+                       macd.unshift(macddata["macdData"][date]["MACD"]);
+                       macdHist.unshift(macddata["macdData"][date]["MACD_Hist"]);
+                       macdSignal.unshift(macddata["macdData"][date]["MACD_Signal"]);
+                       var dateArr = date.split('-');
+                       var utcDate = Date.UTC(dateArr[0],dateArr[1]-1, dateArr[2]);
+                       utcTime.unshift(utcDate);
+                       timeValue.unshift(date.slice(-5).replace('-', '/'));
+                   }
+                   else
+                   {
+                      break;
+                   }
+                }
+
+                Highcharts.chart('indicatorGraph', {
+                chart: {
+                    type: 'line',
+                    zoomType: 'x',
+                    backgroundColor : '#4d4d4d'
+                },
+                exporting: {
+                    enabled:false
+                  },
+                legend: {
+                    itemStyle: {
+                        color: '#FFFFFF',
+                        fontWeight: 'bold'
+                    }
+                 },
+                title: {
+                    text: 'Moving Average Convergence/Divergence (MACD)',
+                    style: {
+                          color: '#FFFFFF'
+                        }
+                },
+                xAxis: {
+                    categories: timeValue,
+                    labels: {
+                        style: {
+                          color: '#FFFFFF'
+                        }
+                    },
+                    tickPositioner : function () {
+                            currTime = utcTime[utcTime.length-1];
+                            positions = [utcTime.length-1];
+                            for (var itr = utcTime.length-1; itr>=0; itr--)
+                            {
+                                if (currTime -utcTime[itr] >=  2*604800000)
+                                {
+                                    positions.unshift(itr);
+                                    currTime = utcTime[itr];
+                                }
+                            }
+
+                            return positions;
+                    }
+
+                },
+                yAxis: {
+                      title: {
+                        text: 'MACD',
+                        style: {
+                          color: '#FFFFFF'
+                        }
+                    },
+                    labels: {
+                        style: {
+                          color: '#FFFFFF'
+                        }
+                  }
+                },
+                plotOptions: {
+                    line: {
+                        enableMouseTracking: true,
+                    },
+                    series: {
+                    animation: false,
+                    allowPointSelect: true
+                    }
+                },
+                series: [
+                    {
+                    name: stockName + " MACD",
+                    color: '#46A04F',
+                    data: macd,
+                    lineWidth: 1,
+                    },
+                    {
+                    name: stockName + " MACD_Hist",
+                    color: '#FFCE38',
+                    data: macdHist,
+                    animation: {
+                       duration: 1000
+                    },
+                    lineWidth: 1
+                    },
+                    {
+                    name: stockName+ " MACD_Signal",
+                    color: '#0000FF',
+                    data: macdSignal,
+                    animation: {
+                       duration: 1000
+                    },
+                    lineWidth: 1
+                    }
+                ]
+            });
+    }
+    function cciGraph(stockName, ccidata){
+                var stock = [];
+                var timeValue = [];
+                var utcTime = [];
+                var currDate;
+
+                if(ccidata == null || !("cciData" in ccidata)){
+                  return;
+                }
+                var counter = 0;
+                for (date in ccidata["cciData"]) {
+                   if(counter == 0) {
+                      currDate = new Date(date);
+                      counter++;
+                   }
+
+                   var timeDifference = currDate.getTime() - new Date(date).getTime();
+                   if (timeDifference <= 15780000000)
+                   {
+                       stock.unshift(ccidata["cciData"][date]["CCI"]);
+                       var dateArr = date.split('-');
+                       var utcDate = Date.UTC(dateArr[0],dateArr[1]-1, dateArr[2]);
+                       utcTime.unshift(utcDate);
+                       timeValue.unshift(date.slice(-5).replace('-', '/'));
+                   }
+                   else
+                   {
+                      break;
+                   }
+                }
+
+                Highcharts.chart('indicatorGraph', {
+                chart: {
+                    type: 'line',
+                    zoomType: 'x',
+                    backgroundColor : '#4d4d4d'
+                },
+                exporting: {
+                    enabled:false
+                  },
+                legend: {
+                    itemStyle: {
+                        color: '#FFFFFF',
+                        fontWeight: 'bold'
+                    }
+                 },
+                title: {
+                    text: 'Commodity Channel Index (CCI)',
+                    style: {
+                          color: '#FFFFFF'
+                        }
+                },
+                xAxis: {
+                    categories: timeValue,
+                     labels: {
+                        style: {
+                              color: '#FFFFFF'
+                            }
+                    },
+                    tickPositioner : function () {
+                            currTime = utcTime[utcTime.length-1];
+                            positions = [utcTime.length-1];
+                            for (var itr = utcTime.length-1; itr>=0; itr--)
+                            {
+                                if (currTime -utcTime[itr] >=  2*604800000)
+                                {
+                                    positions.unshift(itr);
+                                    currTime = utcTime[itr];
+                                }
+                            }
+
+                            return positions;
+                    }
+
+                },
+                yAxis: {
+                     title: {
+                        text: 'CCI',
+                        style: {
+                          color: '#FFFFFF'
+                        }
+                    },
+                    labels: {
+                        style: {
+                          color: '#FFFFFF'
+                        }
+                  }
+                },
+                plotOptions: {
+                    line: {
+                        enableMouseTracking: true,
+                    },
+                    series: {
+                    animation: false,
+                    allowPointSelect: true
+                    }
+                },
+                series: [{
+                    name: stockName,
+                    color: '#FFCE38',
+                    data: stock,
+                    lineWidth: 1
+                }]
+            });
+    }
+
+    function adxGraph(stockName, adxdata){
+
+                var stock = [];
+                var timeValue = [];
+                var utcTime = [];
+                var currDate;
+
+
+                if(adxdata == null || !("adxData" in adxdata)){
+                  return;
+                }
+                var counter = 0;
+                for (date in adxdata["adxData"]) {
+                   if(counter == 0) {
+                      currDate = new Date(date);
+                      counter++;
+                   }
+
+                   var timeDifference = currDate.getTime() - new Date(date).getTime();
+                   if (timeDifference <= 15780000000)
+                   {
+                       stock.unshift(adxdata["adxData"][date]["ADX"]);
+                       var dateArr = date.split('-');
+                       var utcDate = Date.UTC(dateArr[0],dateArr[1]-1, dateArr[2]);
+                       utcTime.unshift(utcDate);
+                       timeValue.unshift(date.slice(-5).replace('-', '/'));
+                   }
+                   else
+                   {
+                      break;
+                   }
+                }
+
+                Highcharts.chart('indicatorGraph', {
+                chart: {
+                    type: 'line',
+                    zoomType: 'x',
+                    backgroundColor : '#4d4d4d'
+                },
+                exporting: {
+                    enabled:false
+                  },
+                legend: {
+                    itemStyle: {
+                        color: '#FFFFFF',
+                        fontWeight: 'bold'
+                    }
+                 },
+                 title: {
+                    text: 'Average Directional Movement Index (ADX)',
+                    style: {
+                          color: '#FFFFFF'
+                        }
+                },
+                xAxis: {
+                    categories: timeValue,
+                    tickPositioner : function () {
+                            currTime = utcTime[utcTime.length-1];
+                            positions = [utcTime.length-1];
+                            for (var itr = utcTime.length-1; itr>=0; itr--)
+                            {
+                                if (currTime -utcTime[itr] >= 2* 604800000)
+                                {
+                                    positions.unshift(itr);
+                                    currTime = utcTime[itr];
+                                }
+                            }
+
+                            return positions;
+                    },
+                     labels: {
+                        style: {
+                          color: '#FFFFFF'
+                        }
+                    }
+
+                },
+                yAxis: {
+                    title: {
+                        text: 'ADX',
+                        style: {
+                          color: '#FFFFFF'
+                        }
+                    },
+                    labels: {
+                        style: {
+                          color: '#FFFFFF'
+                        }
+                  }
+                },
+                plotOptions: {
+                    line: {
+                        enableMouseTracking: true,
+                    },
+                    series: {
+                    animation: false,
+                    allowPointSelect: true
+                    }
+                },
+                series: [{
+                    name: stockName,
+                    color: '#FFCE38',
+                    data: stock,
+                    lineWidth: 1
+                }]
+            });
+    }
+    function rsiGraph(stockName, rsidata){
+
+                var stock = [];
+                var timeValue = [];
+                var utcTime = [];
+                var currDate;
+
+
+                if(rsidata == null || !("rsiData" in rsidata)){
+                  return;
+                }
+                var counter = 0;
+                for (date in rsidata["rsiData"]) {
+                   if(counter == 0) {
+                      currDate = new Date(date);
+                      counter++;
+                   }
+
+                   var timeDifference = currDate.getTime() - new Date(date).getTime();
+                   if (timeDifference <= 15780000000)
+                   {
+                       stock.unshift(rsidata["rsiData"][date]["RSI"]);
+                       var dateArr = date.split('-');
+                       var utcDate = Date.UTC(dateArr[0],dateArr[1]-1, dateArr[2]);
+                       utcTime.unshift(utcDate);
+                       timeValue.unshift(date.slice(-5).replace('-', '/'));
+                   }
+                   else
+                   {
+                      break;
+                   }
+                }
+
+                Highcharts.chart('indicatorGraph', {
+                chart: {
+                    type: 'line',
+                    zoomType: 'x',
+                    backgroundColor : '#4d4d4d'
+                },
+                exporting: {
+                    enabled:false
+                  },
+                legend: {
+                    itemStyle: {
+                        color: '#FFFFFF',
+                        fontWeight: 'bold'
+                    }
+                 },
+                title: {
+                    text: 'Relative Strength Index (RSI)',
+                    style: {
+                          color: '#FFFFFF'
+                        }
+                },
+                xAxis: {
+                    categories: timeValue,
+                    tickPositioner : function () {
+                            currTime = utcTime[utcTime.length-1];
+                            positions = [utcTime.length-1];
+                            for (var itr = utcTime.length-1; itr>=0; itr--)
+                            {
+                                if (currTime -utcTime[itr] >=  2*604800000)
+                                {
+                                    positions.unshift(itr);
+                                    currTime = utcTime[itr];
+                                }
+                            }
+
+                            return positions;
+                    },
+                     labels: {
+                        style: {
+                          color: '#FFFFFF'
+                        }
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: 'RSI',
+                        style: {
+                          color: '#FFFFFF'
+                        }
+                    },
+                     labels: {
+                        style: {
+                          color: '#FFFFFF'
+                        }
+                    }
+
+                },
+                plotOptions: {
+                    line: {
+                        enableMouseTracking: true,
+                    },
+                    series: {
+                    animation: false,
+                    allowPointSelect: true
+                    }
+                },
+                series: [{
+                    name: stockName,
+                    color: '#FFCE38',
+                    data: stock,
+                    lineWidth: 1
+                }]
+            });
+
+    }
+
+
+    function emaGraph(stockName, emadata){
+
+                var stock = [];
+                var timeValue = [];
+                var utcTime = [];
+                var currDate;
+                var count = 0;
+
+                if(emadata == null || !("emaData" in emadata)){
+                  return;
+                }
+                var counter = 0;
+                for (date in emadata["emaData"]) {
+                   if(counter == 0) {
+                      currDate = new Date(date);
+                      counter++;
+                   }
+
+                   var timeDifference = currDate.getTime() - new Date(date).getTime();
+                   if (timeDifference <= 15780000000)
+                   {
+                       stock.unshift(emadata["emaData"][date]["EMA"]);
+                       var dateArr = date.split('-');
+                       var utcDate = Date.UTC(dateArr[0],dateArr[1]-1, dateArr[2]);
+                       utcTime.unshift(utcDate);
+                       timeValue.unshift(date.slice(-5).replace('-', '/'));
+                   }
+                   else
+                   {
+                      break;
+                   }
+                }
+
+                Highcharts.chart('indicatorGraph', {
+                chart: {
+                    type: 'line',
+                    zoomType: 'x',
+                    backgroundColor : '#4d4d4d'
+                },
+                exporting: {
+                    enabled:false
+                  },
+                  legend: {
+                    itemStyle: {
+                        color: '#FFFFFF',
+                        fontWeight: 'bold'
+                    }
+                  },
+                title: {
+                    text: 'Exponential Moving Average (EMA)',
+                      style: {
+                          color: '#FFFFFF'
+                      }
+                },
+                xAxis: {
+                    categories: timeValue,
+                    labels: {
+                      style: {
+                          color: '#FFFFFF'
+                      }
+                    },
+                    tickPositioner : function () {
+                            currTime = utcTime[utcTime.length-1];
+                            positions = [utcTime.length-1];
+                            for (var itr = utcTime.length-1; itr>=0; itr--)
+                            {
+                                if (currTime -utcTime[itr] >=  2*604800000)
+                                {
+                                    positions.unshift(itr);
+                                    currTime = utcTime[itr];
+                                }
+                            }
+
+                            return positions;
+                    }
+    
+                },
+                yAxis: {
+                    title: {
+                        text: 'EMA',
+                        style: {
+                          color: '#FFFFFF'
+                        }
+                    },
+                    labels: {
+                      style: {
+                          color: '#FFFFFF'
+                      }
+                  }
+                },
+                plotOptions: {
+                    line: {
+                        enableMouseTracking: true,
+                    },
+                    series: {
+                    animation: false,
+                    allowPointSelect: true
+                    }
+                },
+                series: [{
+                    name: stockName,
+                    color: '#FFCE38',
+                    data: stock,
+                    lineWidth: 1
+                }]
+            });     
+    }
+    function smaGraph(stockName, smadata){
+
+                var stock = [];
+                var timeValue = [];
+                var utcTime = [];
+                var currDate;
+                var count = 0;
+
+
+                if(smadata == null || !("smaData" in smadata)){
+                  return;
+                }
+                //["smaData"][key]["SMA"] 
+                var counter = 0;
+                for (date in smadata["smaData"]) {
+                   if(counter == 0) {
+                      currDate = new Date(date);
+                      counter++;
+                   }
+
+                   var timeDifference = currDate.getTime() - new Date(date).getTime();
+                   if (timeDifference <= 15780000000)
+                   {
+                       stock.unshift(smadata["smaData"][date]["SMA"]);
+                       var dateArr = date.split('-');
+                       var utcDate = Date.UTC(dateArr[0],dateArr[1]-1, dateArr[2]);
+                       utcTime.unshift(utcDate);
+                       timeValue.unshift(date.slice(-5).replace('-', '/'));
+                   }
+                   else
+                   {
+                      break;
+                   }
+                }
+
+                Highcharts.chart('indicatorGraph', {
+                chart: {
+                    type: 'line',
+                    zoomType: 'x',
+                    backgroundColor : '#4d4d4d'
+                },
+                legend: {
+                    itemStyle: {
+                        color: '#FFFFFF',
+                        fontWeight: 'bold'
+                    }
+                },
+                exporting: {
+                    enabled:false
+                  },
+                title: {
+                    text: 'Simple Moving Average (SMA)',
+                    style: {
+                    color: '#ffffff'
+                    }
+                },
+                xAxis: {
+                    categories: timeValue,
+                    labels: {
+                      style: {
+                          color: '#FFFFFF'
+                      }
+                    },
+                    tickPositioner : function () {
+                            currTime = utcTime[utcTime.length-1];
+                            positions = [utcTime.length-1];
+                            for (var itr = utcTime.length-1; itr>=0; itr--)
+                            {
+                                if (currTime -utcTime[itr] >=  2*604800000)
+                                {
+                                    positions.unshift(itr);
+                                    currTime = utcTime[itr];
+                                }
+                            }
+
+                            return positions;
+                    }
+
+                },
+                yAxis: {
+                    title: {
+                        text: 'SMA',
+                        style: {
+                        color: '#ffffff'
+                        }
+                    },
+                    labels: {
+                      style: {
+                          color: '#FFFFFF'
+                      }
+                  }
+                },
+                plotOptions: {
+                    line: {
+                        enableMouseTracking: true,
+                    },
+                    series: {
+                    animation: false,
+                    allowPointSelect: true
+                    }
+                },
+                series: [{
+                    name: stockName,
+                    color: '#FFCE38',
+                    data: stock,
+                    lineWidth: 1
+                }]
+            });
+      
+    }
+
+    function priceGraph(stockName, stockdata){
+      var stock = [];
+      var volume = [];
+      var timeValue = [];
+      var utcTime = [];
+      var currDate;
+
+      if(stockdata == null || !("prices" in stockdata)){
+        return;
+      }
+       
+      var data = [];
+      var counter = 0;
+      for (date in stockdata["prices"]) {
+         if(counter == 0) {
+            currDate = new Date(date);
+            counter++;
+         }
+
+         var timeDifference = currDate.getTime() - new Date(date).getTime();
+         if (timeDifference <= 15780000000)
+         {
+             volume.unshift(((stockdata["prices"][date]["volume"]/1000000).toFixed(2))*1.0);
+             stock.unshift(stockdata["prices"][date]["close"].toFixed(2)*1.0);
+             var dateArr = date.split('-');
+             var utcDate = Date.UTC(dateArr[0],dateArr[1]-1, dateArr[2]);
+             utcTime.unshift(utcDate);
+             timeValue.unshift(date.slice(-5).replace('-', '/'));
+         }
+         else
+         {
+            break;
+         }
+      }
+      
+      var yInterval = (volume.max() - 60 > 0) ? 30: 15; 
+      Highcharts.chart('indicatorGraph', {
+          chart: {
+              zoomType: 'xy',
+              backgroundColor : '#4d4d4d'
+              },
+          title: {
+              text: stockName + ' Stock Price and Volume',
+              style: {
+                    color: '#FFFFFF',
+                    fontWeight: 'bold'
+                }
+          },             
+          tooltip: {
+              shared: false,
+              useHTML : true,
+              formatter: function() {
+                  var text = '';
+                  if(this.series.name.indexOf('Volume') != -1) {
+                      text = '<small>'+ this.x + '</small>'+ '<br>' + '<span style="color:' + this.series.color + '">\u25CF</span>'+ this.series.name + ': <b>'  
+                                    + this.y * 1000000 + ' </b>';
+                  } else {
+                      text =  '<small>'+ this.x + '</small>'+ '<br>' + '<span style="color:' + this.series.color + '">\u25CF</span> '+ this.series.name + ': <b>'  
+                                    + this.y  + ' </b>';
+                  }
+                  return text;
+              }
+          },
+          exporting: {
+            enabled:false
+          },
+          xAxis: {
+              categories: timeValue,
+              tickPositioner : function () {
+                                  currTime = utcTime[utcTime.length-1];
+                                  positions = [utcTime.length-1];
+                                  for (var it = utcTime.length-1; it>=0; it--)
+                                  {
+                                      if (currTime -utcTime[it] >=  2*604800000)
+                                      {
+                                          positions.unshift(it);
+                                          currTime = utcTime[it];
+                                      }
+                                  }
+
+                                  return positions;
+                          }
+          },
+          yAxis: [{ // Primary yAxis
+              labels: {
+                  format: '{value} $',
+                  style: {
+                      color: '#FFFFFF'
+                  }
+              },
+              title: {
+                  text: 'Stock Price',
+                  style: {
+                      color:'#FFFFFF'
+                  }
+              }
+          }, { // Secondary yAxis
+              title: {
+                  text: 'Volume',
+                  style: {
+                      color: '#FFFFFF'
+                  }
+              },
+              tickInterval: yInterval,
+              labels: {
+                  format: '{value} M',
+                  style: {
+                      color: '#FFFFFF'
+                  }
+              },
+              opposite: true
+          }],
+          series: [
+           {
+              name: "Price",
+              type: 'area',
+              color : '#6666ff',
+              data: stock,
+              tooltip: {
+                  valueSuffix: ''
+              }
+          },
+          {
+              name: 'Volume',
+              type: 'column',
+              color: '#FF0000',
+              yAxis: 1,
+              data: volume
+          }]
+      });
+       
+    }
+</script>
+</body>
+</html>
