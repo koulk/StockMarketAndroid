@@ -6,5 +6,4 @@ package com.example.kalhan.stockmarkettracker.Model;
 
 public interface StockDetailsInterface {
      void setStockData(StockInformation stockData);
-     void setShareableNewsURL(String url);
 }
