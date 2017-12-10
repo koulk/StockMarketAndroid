@@ -62,14 +62,9 @@ public class StockDetailsActivity extends AppCompatActivity implements StockDeta
      */
     private ViewPager mViewPager;
     private ArrayList<StockInformation> favoriteList = null;
-    private String stockName, stockDisplayText, shareURL;
+    private String stockName, stockDisplayText;
     private StockInformation stockInfo;
     private boolean isFavorite;
-
-    @Override
-    public void setShareableNewsURL(String url){
-        shareURL = url;
-    }
 
     @Override
     public void setStockData(StockInformation stockdata){
