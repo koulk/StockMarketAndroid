@@ -1,0 +1,233 @@
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/backgroundGrey"
+    >
+
+<LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:focusableInTouchMode="true"
+    android:background="@color/backgroundGrey"
+    >
+
+    <ProgressBar
+        android:id="@+id/stock_loading_indicator"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/error_message"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="15dp"
+        android:text="Failed to load data."
+        android:textSize="20sp"
+        android:textColor="@android:color/white"
+        android:visibility="gone"
+        />
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:visibility= "invisible"
+        android:orientation="vertical"
+        android:layout_marginTop="15dp"
+        android:id="@+id/stock_info_table"
+        >
+            <TextView
+                android:text="Stock Symbol"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:textAppearance="?android:attr/textAppearanceListItemSecondary"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="6dp"
+                android:padding="2dp" />
+            <TextView
+                android:id="@+id/stock_table_name"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:textAppearance="?android:attr/textAppearanceListItem"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp"
+                android:padding="1dp" />
+
+            <TextView
+                android:text="Last Price"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:textAppearance="?android:attr/textAppearanceListItemSecondary"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="6dp"
+                android:padding="2dp"/>
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:id="@+id/stock_table_last_price"
+                android:textAppearance="?android:attr/textAppearanceListItem"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp"
+                android:padding="1dp"
+                 />
+            <TextView
+                android:text="Change"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:textAppearance="?android:attr/textAppearanceListItemSecondary"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="6dp"
+                android:padding="2dp"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <TextView
+                android:id="@+id/stock_table_change"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceListItem"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp"
+                android:padding="1dp"/>
+
+        <ImageView
+            android:id="@+id/stock_table_change_symbol"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/green_arrow_up" />
+        </LinearLayout>
+            <TextView
+                android:text="Timestamp"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:textAppearance="?android:attr/textAppearanceListItemSecondary"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="6dp"
+                android:padding="2dp" />
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:id="@+id/stock_table_timestamp"
+                android:textAppearance="?android:attr/textAppearanceListItem"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp"
+                android:padding="1dp"
+                 />
+            <TextView
+                android:text="Open"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:textAppearance="?android:attr/textAppearanceListItemSecondary"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="6dp"
+                android:padding="2dp" />
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:id="@+id/stock_table_open"
+                android:textAppearance="?android:attr/textAppearanceListItem"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp"
+                android:padding="1dp"
+                 />
+            <TextView
+                android:text="Close"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:textAppearance="?android:attr/textAppearanceListItemSecondary"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="6dp"
+                android:padding="2dp"/>
+            <TextView
+                android:id="@+id/stock_table_close"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:textAppearance="?android:attr/textAppearanceListItem"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp"
+                android:padding="1dp"
+                 />
+
+            <TextView
+                android:text="Day's Range"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:textAppearance="?android:attr/textAppearanceListItemSecondary"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="6dp"
+                android:padding="2dp" />
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:id="@+id/stock_table_range"
+                android:textAppearance="?android:attr/textAppearanceListItem"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp"
+                android:padding="1dp"
+                 />
+            <TextView
+                android:text="Volume"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:textAppearance="?android:attr/textAppearanceListItemSecondary"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="6dp"
+                android:padding="2dp" />
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:id="@+id/stock_table_volume"
+                android:textAppearance="?android:attr/textAppearanceListItem"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp"
+                android:padding="1dp"
+                />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp">
+        <TextView
+            android:layout_width="0dp"
+            android:textColor="@android:color/white"
+            android:layout_height="wrap_content"
+            android:text="@string/indicator_title"
+            android:padding="5dp"
+            android:layout_marginStart="4dp"
+            android:textSize="20sp"
+            android:layout_weight="2"
+            />
+        <Spinner
+            android:id="@+id/indicator_spinner"
+            android:overlapAnchor="false"
+            android:layout_width="wrap_content"
+            android:textSize="16sp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <WebView
+        android:id="@+id/indicator_graph"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/backgroundGrey"
+        android:paddingBottom="10dp"
+        />
+
+</LinearLayout>
+</ScrollView>

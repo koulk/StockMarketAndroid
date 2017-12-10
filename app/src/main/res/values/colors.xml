@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#000000</color>
+    <color name="colorPrimaryDark">#FFFFFF</color>
+    <color name="colorAccent">#FFCE38</color>
+    <color name="backgroundGrey">#4d4d4d</color>
+    <color name="actionBarColor">#46A04F</color>
+    <color name="yellowTint">#FFCE38</color>
+    <color name="favorite_red_stock">#FF5746</color>
+    <color name="favorite_green_stock">#068B59</color>
+</resources>
