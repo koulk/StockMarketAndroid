@@ -69,7 +69,6 @@ public class FavoriteStockRefreshTask extends AsyncTask<Void, Void, StockInforma
                     lastPrice = stock.getDouble("close");
                     high = stock.getDouble("high");
                     volume = stock.getDouble("volume");
-                    Log.i("Volume background", String.valueOf(volume));
                     low = stock.getDouble("low");
                     timestamp = (String) key;
                     count++;
@@ -101,7 +100,7 @@ public class FavoriteStockRefreshTask extends AsyncTask<Void, Void, StockInforma
 
             // Null check is for failed request.
             for(int itr=0; itr< activity.favoriteList.size() && result!=null; itr++){
-                if(activity.favoriteList.get(itr).getStockName() == stockSymbol){
+                if(activity.favoriteList.get(itr).getStockName().equals(stockSymbol)){
                     activity.favoriteList.set(itr, result);
                     activity.sortFavoriteList(activity.sortCategoryIndex, activity.sortTypeIndex);
                     activity.favoriteListAdaptor.notifyDataSetChanged();

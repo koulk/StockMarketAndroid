@@ -1,5 +1,6 @@
 package com.example.kalhan.stockmarkettracker.Model;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 
 /**
