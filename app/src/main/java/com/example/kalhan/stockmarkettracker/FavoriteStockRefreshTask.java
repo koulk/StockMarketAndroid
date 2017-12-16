@@ -22,12 +22,12 @@ import java.util.Iterator;
 
 public class FavoriteStockRefreshTask extends AsyncTask<Void, Void, StockInformation> {
     private String serverUrl = "http://alphavantageapi-env.us-east-2.elasticbeanstalk.com/api/compactdata?stockName=";
-    private WeakReference<StockSearchActivity> activityReference;
+    private WeakReference<StockSearchActivity.SearchFragment> fragmentReference;
     private String stockSymbol, stockDisplayName;
 
-    public FavoriteStockRefreshTask(StockSearchActivity context, String stockSymbol, String stockDisplayName)
+    public FavoriteStockRefreshTask(StockSearchActivity.SearchFragment context, String stockSymbol, String stockDisplayName)
     {
-        activityReference = new WeakReference<>(context);
+        fragmentReference = new WeakReference<>(context);
         this.stockSymbol = stockSymbol;
         this.stockDisplayName = stockDisplayName;
     }
@@ -93,25 +93,25 @@ public class FavoriteStockRefreshTask extends AsyncTask<Void, Void, StockInforma
 
     @Override
     protected void onPostExecute(StockInformation result) {
-        StockSearchActivity activity = activityReference.get();
-        if (activity == null) return;
-        synchronized (activity.favoriteList){
-            StockSearchActivity.requestPendingCount--;
+        StockSearchActivity.SearchFragment fragment = fragmentReference.get();
+        if (fragment == null) return;
+        synchronized (fragment.favoriteList){
+            StockSearchActivity.SearchFragment.requestPendingCount--;
 
             // Null check is for failed request.
-            for(int itr=0; itr< activity.favoriteList.size() && result!=null; itr++){
-                if(activity.favoriteList.get(itr).getStockName().equals(stockSymbol)){
-                    activity.favoriteList.set(itr, result);
-                    activity.sortFavoriteList(activity.sortCategoryIndex, activity.sortTypeIndex);
-                    activity.favoriteListAdaptor.notifyDataSetChanged();
-                    activity.updateFavorites();
+            for(int itr=0; itr< fragment.favoriteList.size() && result!=null; itr++){
+                if(fragment.favoriteList.get(itr).getStockName().equals(stockSymbol)){
+                    fragment.favoriteList.set(itr, result);
+                    fragment.sortFavoriteList(fragment.sortCategoryIndex, fragment.sortTypeIndex);
+                    fragment.favoriteListAdaptor.notifyDataSetChanged();
+                    fragment.updateFavorites();
                     break;
                 }
             }
             // All requests fulfilled
-            if(StockSearchActivity.requestPendingCount == 0){
-                activity.refreshButton.clearAnimation();
-                activity.refreshButton.setClickable(true);
+            if(StockSearchActivity.SearchFragment.requestPendingCount == 0){
+                fragment.refreshButton.clearAnimation();
+                fragment.refreshButton.setClickable(true);
             }
         }
 

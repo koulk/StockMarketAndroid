@@ -2,16 +2,18 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:background="@color/yellowTint"
     android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="20dp"
-        android:paddingTop="5dp"
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:textSize="15sp"
-        android:textColor="#a3a2a2"
+        android:textColor="@android:color/black"
         android:text="@string/favorite_context_title"
      />
 </android.support.constraint.ConstraintLayout>

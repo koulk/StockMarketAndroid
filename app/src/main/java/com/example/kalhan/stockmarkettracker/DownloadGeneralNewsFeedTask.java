@@ -23,11 +23,11 @@ import java.util.ArrayList;
 
 public class DownloadGeneralNewsFeedTask extends AsyncTask<Void, Void, ArrayList<NewsItem>> {
     private String serverBaseURL,apiKey;
-    private WeakReference<StockSearchActivity> activityReference;
+    private WeakReference<StockSearchActivity.GeneralNewsFragment> fragmentReference;
 
-    public DownloadGeneralNewsFeedTask(StockSearchActivity context)
+    public DownloadGeneralNewsFeedTask(StockSearchActivity.GeneralNewsFragment context)
     {
-        activityReference = new WeakReference<>(context);
+        fragmentReference = new WeakReference<>(context);
     }
 
     // This is run in a background thread
@@ -76,25 +76,25 @@ public class DownloadGeneralNewsFeedTask extends AsyncTask<Void, Void, ArrayList
 
     @Override
     protected void onPreExecute() {
-        StockSearchActivity activity = activityReference.get();
-        if (activity == null) return;
-        activity.newsLoader.setVisibility(View.VISIBLE);
-        serverBaseURL = activity.getString(R.string.news_api_endpoint);
-        apiKey = activity.getString(R.string.news_api_key);
+        StockSearchActivity.GeneralNewsFragment fragment = fragmentReference.get();
+        if (fragment == null) return;
+        fragment.newsLoader.setVisibility(View.VISIBLE);
+        serverBaseURL = fragment.getString(R.string.news_api_endpoint);
+        apiKey = fragment.getString(R.string.news_api_key);
     }
 
 
     @Override
     protected void onPostExecute(ArrayList<NewsItem> result) {
         //super.onPostExecute(result);
-        StockSearchActivity activity = activityReference.get();
-        if (activity == null) return;
+        StockSearchActivity.GeneralNewsFragment fragment = fragmentReference.get();
+        if (fragment == null) return;
 
-        activity.newsArticles.clear();
-        activity.newsArticles.addAll(result);
+        fragment.newsArticles.clear();
+        fragment.newsArticles.addAll(result);
 
-        activity.newsLoader.setVisibility(View.GONE);
-        activity.newsFeedAdapter.notifyDataSetChanged();
+        fragment.newsLoader.setVisibility(View.GONE);
+        fragment.newsFeedAdapter.notifyDataSetChanged();
     }
 
 }
