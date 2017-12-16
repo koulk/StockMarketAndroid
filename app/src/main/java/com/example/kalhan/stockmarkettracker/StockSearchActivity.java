@@ -51,7 +51,7 @@ public class StockSearchActivity extends AppCompatActivity {
     private Button getQuote, clearButton;
     private String stockName, stockDisplayName;
     protected int sortCategoryIndex=0, sortTypeIndex=0;
-    protected ArrayList<StockInformation> favoriteList = new ArrayList<>();
+    protected final ArrayList<StockInformation> favoriteList = new ArrayList<>();
     protected FavoriteListAdaptor favoriteListAdaptor = null;
     protected ArrayList<NewsItem> newsArticles = new ArrayList();
     protected NewsListAdapter newsFeedAdapter;

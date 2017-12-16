@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -22,6 +23,21 @@ import java.util.Iterator;
 
 public class DownloadStockInfoTask  extends AsyncTask<String, Integer, StockInformation> {
     private String serverUrl = "http://alphavantageapi-env.us-east-2.elasticbeanstalk.com/api/compactdata?stockName=";
+
+    private WeakReference<StockDetailsActivity.StockInfoFragment> fragmentReference;
+
+    public DownloadStockInfoTask(StockDetailsActivity.StockInfoFragment context)
+    {
+        fragmentReference = new WeakReference<>(context);
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        StockDetailsActivity.StockInfoFragment fragment = fragmentReference.get();
+        if (fragment == null || fragment.getView()== null) return;
+        fragment.preRequestExecute(fragment.getView());
+    }
 
     // This is run in a background thread
     @Override
@@ -83,6 +99,15 @@ public class DownloadStockInfoTask  extends AsyncTask<String, Integer, StockInfo
             ex.printStackTrace();
         }
         return stockInfo;
+    }
+
+    @Override
+    protected void onPostExecute(StockInformation stockInfo) {
+        super.onPostExecute(stockInfo);
+
+        StockDetailsActivity.StockInfoFragment fragment = fragmentReference.get();
+        if (fragment == null || fragment.getView() == null) return;
+        fragment.postRequestExecute(fragment.getView(), stockInfo);
     }
 
 }

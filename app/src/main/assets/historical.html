@@ -81,17 +81,7 @@ function buildHistoricalChart(stockdata, stockName){
 
               Highcharts.stockChart('container', {
                   chart: {
-                          zoomType: 'x',
-                          events:{
-                          load: function() {
-                              this.subtitle.element.onclick = function() {
-                                  window.open(
-                                  'https://www.alphavantage.co',
-                                  '_blank'
-                                  );
-                              }
-                            }
-                         }
+                          zoomType: 'x'
                   },
                   tooltip: {
                           formatter: function () {
@@ -139,12 +129,6 @@ function buildHistoricalChart(stockdata, stockName){
 
                   title: {
                       text: stockName + " Stock Value"
-                  },
-                  subtitle: {
-                    text: 'Source: Alpha Vantage',
-                    style: {
-                    color: '#0000ff'
-                    }
                   },
                   yAxis: {
                       title: {
