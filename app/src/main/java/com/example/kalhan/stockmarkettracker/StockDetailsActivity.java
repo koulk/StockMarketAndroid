@@ -49,19 +49,7 @@ import java.util.Date;
 
 public class StockDetailsActivity extends AppCompatActivity implements StockDetailsInterface{
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
     private ViewPager mViewPager;
     private ArrayList<StockInformation> favoriteList = null;
     private String stockName, stockDisplayText;
@@ -106,7 +94,7 @@ public class StockDetailsActivity extends AppCompatActivity implements StockDeta
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setBackgroundColor(getResources().getColor(R.color.backgroundGrey));
+        //tabLayout.setBackgroundColor(getResources().getColor(R.color.backgroundGrey));
         tabLayout.setTabTextColors(getResources().getColor(R.color.colorPrimaryDark), getResources().getColor(R.color.colorPrimaryDark));
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
@@ -114,9 +102,6 @@ public class StockDetailsActivity extends AppCompatActivity implements StockDeta
         getSupportActionBar().setTitle(stockDisplayText);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources()
-                .getColor(R.color.actionBarColor)));
-
     }
 
 
@@ -353,90 +338,6 @@ public class StockDetailsActivity extends AppCompatActivity implements StockDeta
             //final View rootView = view;
             DownloadStockInfoTask stockInfoTask = new DownloadStockInfoTask(this);
             stockInfoTask.execute(stockSymbol);
-
-               /* new DownloadStockInfoTask() {
-                    @Override
-                    protected void onPreExecute() {
-                        super.onPreExecute();
-                        if(getView() == null){
-                            return;
-                        }
-                        ProgressBar loader = (ProgressBar) rootView.findViewById(R.id.stock_loading_indicator);
-                        loader.getIndeterminateDrawable().setColorFilter(0xFF000000, android.graphics.PorterDuff.Mode.MULTIPLY);
-                        loader.setVisibility(View.VISIBLE);
-                    }
-
-                    @Override
-                    protected void onPostExecute(StockInformation stockInfo) {
-                        super.onPostExecute(stockInfo);
-                        if(getView() == null){
-                            return;
-                        }
-                        ProgressBar loader = (ProgressBar)rootView.findViewById(R.id.stock_loading_indicator);
-                        loader.setVisibility(View.GONE);
-                        TextView error = rootView.findViewById(R.id.error_message);
-                        //CheckBox favorite = (CheckBox) rootView.findViewById(R.id.favorite_button);
-
-                        if(stockInfo != null){
-                            mStockDetailsInterface.setStockData(stockInfo);
-                            DecimalFormat df = new DecimalFormat("#.##");
-                            df.setRoundingMode(RoundingMode.CEILING);
-
-                            TextView change = rootView.findViewById(R.id.stock_table_change);
-                            change.setText(df.format(stockInfo.getChange())+" "+stockInfo.getChangePercentage());
-                            if(stockInfo.getChange() < 0){
-                                ImageView changeSign = rootView.findViewById(R.id.stock_table_change_symbol);
-                                changeSign.setImageDrawable(getResources().getDrawable(R.drawable.red_arrow_down));
-                            }
-                            TextView symbol =rootView.findViewById(R.id.stock_table_name);
-                            symbol.setText(String.valueOf(stockInfo.getStockName()));
-                            TextView range = rootView.findViewById(R.id.stock_table_range);
-                            range.setText(String.valueOf(stockInfo.getRangeValue()));
-                            TextView lastprice = rootView.findViewById(R.id.stock_table_last_price);
-                            lastprice.setText(df.format(stockInfo.getLastPrice()));
-
-                            TextView open = rootView.findViewById(R.id.stock_table_open);
-                            open.setText(String.valueOf(stockInfo.getOpenPrice()));
-                            TextView close = rootView.findViewById(R.id.stock_table_close);
-                            close.setText(String.valueOf(stockInfo.getClosePrice()));
-                            TextView volume = (TextView) rootView.findViewById(R.id.stock_table_volume);
-                            volume.setText(df.format(stockInfo.getVolume()));
-                            LinearLayout table = (LinearLayout) rootView.findViewById(R.id.stock_info_table);
-
-                            // Timestamp
-                            Date d = new Date();
-                            long utc = d.getTime() + (d.getTimezoneOffset() * 60000);
-                            Date nycTime = new Date(utc + (3600000*-5));
-                            TextView timestamp = rootView.findViewById(R.id.stock_table_timestamp);
-                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            try{
-                                Date endTime = simpleDateFormat.parse(stockInfo.getTimestamp()+" 16:00:00");
-                                if (endTime.after(nycTime)){
-                                    timestamp.setText(simpleDateFormat.format(nycTime) + " EDT");
-
-                                }
-                                else{
-                                    timestamp.setText(stockInfo.getTimestamp()+ " 16:00:00 EDT");
-                                    close.setText(lastprice.getText());
-                                }
-                            }
-                            catch (ParseException exp){
-                                exp.printStackTrace();
-                            }
-
-
-                            table.setVisibility(View.VISIBLE);
-                            error.setVisibility(View.GONE);
-                            //favorite.setEnabled(true);
-                        }
-                        else{
-                            error.setVisibility(View.VISIBLE);
-                            //favorite.setEnabled(false);
-                        }
-
-                    }
-                }.execute(stockSymbol);*/
-
         }
         private View displayStockInfo(LayoutInflater inflater, ViewGroup container){
             View rootView = inflater.inflate(R.layout.fragment_stock_details, container, false);

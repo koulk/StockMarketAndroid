@@ -14,6 +14,11 @@
     <string name="favorite_order_category">Sort By</string>
     <string name="favorite_order_type">Order</string>
     <string name="favorite_table_header">Favorites</string>
+    <string name="current_details_header">CURRENT</string>
+    <string name="historical_details_header">HISTORICAL</string>
+    <string name="favorite_details_header">FAVORITES</string>
+    <string name="news_general_details_header">FINANCIAL NEWS</string>
+    <string name="news_details_header">NEWS</string>
     <string name="favorite_table_volume_header">Volume :</string>
     <string name="autorefresh">AutoRefresh</string>
     <string name="favorite_context_title">Remove from favorites?</string>
